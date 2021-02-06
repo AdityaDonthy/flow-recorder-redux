@@ -1,4 +1,4 @@
-import { Action, AnyAction } from "redux";
+import { Action } from "redux";
 import { RootState } from "./store";
 
 /* According to the Ducks proposal, A module…
