@@ -1,9 +1,13 @@
+import React from 'react';
 import './App.css';
+import Calendar from './Calendar';
+import Recorder from './Recorder/Recorder';
 
 function App() {
   return (
     <div className="App">
-      hello react
+      <Recorder />
+      <Calendar />
     </div>
   );
 }
