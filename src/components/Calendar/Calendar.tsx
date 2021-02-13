@@ -1,5 +1,4 @@
 import React, { useEffect } from "react";
-import moment from "moment";
 
 import "./calendar.css";
 import { connect } from "react-redux";
@@ -10,6 +9,7 @@ import {
   loadUserEvents,
   UserEvent,
 } from "../../redux/user-events";
+import EventItem from "./EventItem";
 
 interface StateProps {
   events: UserEvent[];
@@ -108,20 +108,7 @@ const Calendar: React.FC<Props> = ({ events, loadUserEvents }) => {
             </div>
             <div className="calendar-events">
               {events.map((event) => {
-                return (
-                  <div key={event.id} className="calendar-event">
-                    <div className="calendar-event-info">
-                      <div className="calendar-event-time">
-                        {moment.utc(event.startDate).format("HH:mm:ss")} -{" "}
-                        {moment.utc(event.endDate).format("HH:mm:ss")}
-                      </div>
-                      <div className="calendar-event-title">{event.title}</div>
-                    </div>
-                    <button className="calendar-event-delete-button">
-                      &times;
-                    </button>
-                  </div>
-                );
+                return <EventItem key={event.id} event={event} />
               })}
             </div>
           </div>
