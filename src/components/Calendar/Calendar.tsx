@@ -1,9 +1,15 @@
-import React, { useEffect } from 'react'
-import './calendar.css';
-import {connect} from 'react-redux'
-import { RootState } from '../../redux/store';
+import React, { useEffect } from "react";
+import moment from "moment";
 
-import { selectUserEventsArray, loadUserEvents, UserEvent } from '../../redux/user-events';
+import "./calendar.css";
+import { connect } from "react-redux";
+import { RootState } from "../../redux/store";
+
+import {
+  selectUserEventsArray,
+  loadUserEvents,
+  UserEvent,
+} from "../../redux/user-events";
 
 interface StateProps {
   events: UserEvent[];
@@ -14,66 +20,118 @@ interface StateProps {
 //ConnectedProps - Infers the type of props that a connector will inject into a component.
 //type StateProps = ConnectedProps<typeof connector>;
 
-interface Props extends StateProps {
-
-}
+interface Props extends StateProps {}
 
 //We have encapsulated the logic of selecting the part of the state required for this component in a selector 'selectUserEventsArray'
 
 const mapStateToProps = (state: RootState) => {
   return {
-    events: selectUserEventsArray(state)
-  }
-}
+    events: selectUserEventsArray(state),
+  };
+};
 
 //This is the thunk action which has the logic of making an async request and then dispatchig the actual payload to the store
 const mapDispatchToProps = {
-  loadUserEvents
-}
+  loadUserEvents,
+};
+
+const addZero = (num: number) => (num < 10 ? `0${num}` : `${num}`);
+
+const createDateKey = (date: Date) => {
+  const year = date.getUTCFullYear();
+  const month = date.getUTCMonth() + 1;
+  const day = date.getUTCDate();
+  return `${year}-${addZero(month)}-${addZero(day)}`;
+};
+
+//Logic to group events by the day
+const groupEventsByDay = (events: UserEvent[]) => {
+  //A dictionary of string and object
+  const groups: Record<string, UserEvent[]> = {};
+
+  const addToGroup = (dateKey: string, event: UserEvent) => {
+    if (groups[dateKey] === undefined) {
+      groups[dateKey] = [];
+    }
+
+    groups[dateKey].push(event);
+  };
+
+  events.forEach((event) => {
+    const dateStartKey = createDateKey(new Date(event.startDate));
+    const dateEndKey = createDateKey(new Date(event.endDate));
+
+    addToGroup(dateStartKey, event);
+
+    //ends on a different date
+    if (dateEndKey !== dateStartKey) {
+      addToGroup(dateEndKey, event);
+    }
+  });
+
+  return groups;
+};
 
 // The connect function's split into 2 instead of the currying syntax
 const connector = connect(mapStateToProps, mapDispatchToProps);
 
-  const Calendar: React.FC<Props> = ({events, loadUserEvents}) => {
+const Calendar: React.FC<Props> = ({ events, loadUserEvents }) => {
+  //Call the thunk action on initial mount of component
+  useEffect(() => {
+    loadUserEvents();
+  }, []);
 
-    //Call the thunk action on initial mount of component
-    useEffect(()=>{
-      loadUserEvents();
-    },[]);
-    console.log('events:', events)    
-    return (
-      <div className="calendar">
-        <div className="calendar-day">
-          <div className="calendar-day-label">
-            <span>1 February</span>
-          </div>
-          <div className="calendar-events">
-            <div className="calendar-event">
-              <div className="calendar-event-info">
-                <div className="calendar-event-time">10:00 - 12:00</div>
-                <div className="calendar-event-title">Learning TypeScript</div>
-              </div>
-              <button className="calendar-event-delete-button">&times;</button>
-            </div>
-          </div>
-        </div>
-        <div className="calendar-day">
-          <div className="calendar-day-label">
-            <span>2 February</span>
-          </div>
-          <div className="calendar-events">
-            <div className="calendar-event">
-              <div className="calendar-event-info">
-                <div className="calendar-event-time">10:00 - 12:00</div>
-                <div className="calendar-event-title">Learning TypeScript</div>
-              </div>
-              <button className="calendar-event-delete-button">&times;</button>
-            </div>
-          </div>
-        </div>
-      </div>
+  let groupedEvents: ReturnType<typeof groupEventsByDay> | undefined;
+  let sortedGroupKeys: string[] | undefined;
+
+  if (events.length) {
+    groupedEvents = groupEventsByDay(events);
+    sortedGroupKeys = Object.keys(groupedEvents).sort(
+      (date1, date2) => +new Date(date1) - +new Date(date2)
     );
-}
+  }
+
+  return groupedEvents && sortedGroupKeys ? (
+    <div className="calendar-container">
+      {sortedGroupKeys.map((dayKey) => {
+        const events = groupedEvents ? groupedEvents[dayKey] : [];
+        const groupDate = new Date(dayKey);
+        const day = groupDate.getDate();
+        const month = groupDate.toLocaleString(undefined, { month: "long" });
+
+        return (
+          <div className="calendar-day">
+            <div className="calendar-day-label">
+              <span>
+                {day} {month}
+              </span>
+            </div>
+            <div className="calendar-events">
+              {events.map((event) => {
+                return (
+                  <div key={event.id} className="calendar-event">
+                    <div className="calendar-event-info">
+                      <div className="calendar-event-time">
+                        {moment.utc(event.startDate).format("HH:mm:ss")} -{" "}
+                        {moment.utc(event.endDate).format("HH:mm:ss")}
+                      </div>
+                      <div className="calendar-event-title">{event.title}</div>
+                    </div>
+                    <button className="calendar-event-delete-button">
+                      &times;
+                    </button>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  ) : (
+    <div>Loading...</div>
+  );
+};
 
 //The final export will be a component which is connected to the redux store with complete capability to read and write
 export default connector(Calendar);

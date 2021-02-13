@@ -19,3 +19,5 @@ window.firestore = db;
 export const firestore = firebase.firestore();
 
 export default firebase;
+
+var eventsRef = db.collection("events");

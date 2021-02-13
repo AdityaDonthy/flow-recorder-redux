@@ -8,8 +8,8 @@ const LOAD_SUCCESS = 'userEvents/load-success';
 export interface UserEvent {
   id: number;
   title: string;
-  dateStart: string;
-  dateEnd: string;
+  startDate: string;
+  endDate: string;
 }
 
 interface LoadRequestAction extends Action<typeof LOAD_REQUEST> {}

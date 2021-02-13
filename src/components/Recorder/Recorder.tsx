@@ -15,7 +15,8 @@ const addZero = (num: number) => {
 function Recorder() {
   const dispatch = useDispatch();
   //huge -> I'm accessing a selector function written in my redux duck and passing it to the redux's useSelector
-  // Redux's useSelector will inturn call the passed in selector with the global state and the selector selects the specific state object from the state tree
+  // Redux's useSelector will inturn call the passed in selector with the global state and the selector selects 
+  //the specific state object from the state tree
   // It's used to read/select the specific part of the state tree
   // useSelector() will also subscribe to the Redux store, and run your selector whenever an action is dispatched.
   // So I dispatch an action , state changes, useSelector is subscribed to the store, so it's run again and the component is
