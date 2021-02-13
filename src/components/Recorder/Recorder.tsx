@@ -7,6 +7,7 @@ import {
 } from "./../../redux/recorder";
 import cx from "classnames";
 import "./Recorder.css";
+import { createUserEvent } from "../../redux/user-events";
 
 const addZero = (num: number) => {
   if (num < 10) return `0${num}`;
@@ -33,6 +34,7 @@ function Recorder() {
   const handleClick = () => {
     if (started) {
       window.clearInterval(interval.current);
+      dispatch(createUserEvent())
       dispatch(StopRecorder());
     } else {
       dispatch(StartRecorder());
