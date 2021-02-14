@@ -128,7 +128,7 @@ export const createUserEvent = (): ThunkAction<
 
     var eventsRef = firestore.collection("events");
     var doc = await eventsRef.add(event);
-
+    console.log('Added document to firestore', doc)
     //Dispatch the action to the store and pass the action object in the payload
     //reducer will add it and notify the subscribers, so the UI can render it
     dispatch({

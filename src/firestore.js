@@ -20,4 +20,4 @@ export const firestore = firebase.firestore();
 
 export default firebase;
 
-var eventsRef = db.collection("events");
+//var eventsRef = db.collection("events");

@@ -79,7 +79,7 @@ const Calendar: React.FC<Props> = ({ events, loadUserEvents }) => {
   //Call the thunk action on initial mount of component
   useEffect(() => {
     loadUserEvents();
-  }, []);
+  }, [loadUserEvents]);
 
   let groupedEvents: ReturnType<typeof groupEventsByDay> | undefined;
   let sortedGroupKeys: string[] | undefined;
