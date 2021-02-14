@@ -57,7 +57,8 @@ const EventItem: React.FC<Props> = ({event}) => {
                             value={title} 
                             ref={inputRef} 
                             onChange={handleTitleChange}
-                            onBlur={handleTitleBlur}/>)
+                            onBlur={handleTitleBlur}
+                            className="calendar-title-input"/>)
                       :(<span onClick={handleTitleClick}>{title}</span>)
             }
         </div>

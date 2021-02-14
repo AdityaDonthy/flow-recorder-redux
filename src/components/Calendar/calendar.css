@@ -60,3 +60,21 @@
   padding: 0;
   width: 23px;
 }
+
+.calendar-title-input{
+  border:1px solid #bbb;
+  border-radius:20px;
+  height: 20px;
+  padding-left: 12px;
+  color: #0e8be6;
+  outline: none;
+}
+
+.loading{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 40px;
+  font-family: monospace;
+  font-size: 30px;
+}

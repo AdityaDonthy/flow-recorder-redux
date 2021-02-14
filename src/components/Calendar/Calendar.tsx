@@ -116,7 +116,7 @@ const Calendar: React.FC<Props> = ({ events, loadUserEvents }) => {
       })}
     </div>
   ) : (
-    <div>Loading...</div>
+    <div className="loading">Loading...</div>
   );
 };
 
