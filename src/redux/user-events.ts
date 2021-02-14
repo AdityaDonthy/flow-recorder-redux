@@ -15,6 +15,10 @@ const DELETE_REQUEST = "userEvents/delete_request";
 const DELETE_SUCCESS = "userEvents/delete_success";
 const DELETE_FAILURE = "userEvents/delete_failure";
 
+const UPDATE_REQUEST = 'userEvents/update_request'
+const UPDATE_SUCCESS = 'userEvents/update_success'
+const UPDATE_FAILURE = 'userEvents/update_failure'
+
 function getRandomNumber(min: number, max: number) {
   return Math.random() * (max - min) + min;
 }
@@ -53,6 +57,18 @@ interface DeleteSuccessAction extends Action<typeof DELETE_SUCCESS> {
 }
 
 interface DeleteRequestAction extends Action<typeof DELETE_REQUEST> {}
+
+interface UpdateFailureAction extends Action<typeof UPDATE_FAILURE>{}
+
+interface UpdateSuccessAction extends Action<typeof UPDATE_SUCCESS>{
+    payload: { event: UserEvent };
+}
+
+interface UpdateRequestAction extends Action<typeof UPDATE_REQUEST>{
+    payload: {
+        title: string
+    }
+}
 
 export const loadUserEvents = (): ThunkAction<
   void,
@@ -155,6 +171,43 @@ export const deleteUserEvent = (
     dispatch({ type: DELETE_FAILURE });
   }
 };
+
+export const updateUserEvent = (event: UserEvent): ThunkAction<
+Promise<void>,
+RootState,
+undefined,
+UpdateRequestAction | UpdateSuccessAction | UpdateFailureAction
+> => async (dispatch) => {
+    const {title} = event
+    dispatch({
+        type: UPDATE_REQUEST,
+        payload: {
+            title
+        }
+    });
+
+    try{
+        var eventsRef = firestore.collection("events");
+        const doc = await eventsRef.where("id", "==", event.id).get();
+        doc.forEach((element) => {
+        element.ref.update({'title': title});
+        console.log(`updated: ${element.id}`);
+        });
+        dispatch({
+            type: UPDATE_SUCCESS,
+            payload: {
+                event: {
+                    ...event,
+                    title
+                }
+            }
+        })
+    }catch(e){
+        dispatch({
+            type: UPDATE_FAILURE
+        })
+    }
+}
 interface UserEventsState {
   //maintain  a dictionary of the id from the UserEvent object and the actual UserEvent Object
   // Another way of wriring this is Record<number, UserEvent>; The advantage is if the type of id changed , TS will infer this !
@@ -181,7 +234,7 @@ export const selectUserEventsArray = (rootState: RootState) => {
 
 const userEventsReducer = (
   state: UserEventsState = initialState,
-  action: LoadSuccessAction | CreateEventSuccessAction | DeleteSuccessAction
+  action: LoadSuccessAction | CreateEventSuccessAction | DeleteSuccessAction | UpdateSuccessAction
 ) => {
   switch (action.type) {
     case LOAD_SUCCESS:
@@ -213,6 +266,13 @@ const userEventsReducer = (
         };
         delete newState.byIds[id];
         return newState;
+    case UPDATE_SUCCESS:
+        //rename while destructuring it, You need to add a : 
+        const { event: updatedEvent } = action.payload;
+        return {
+            ...state,
+            byIds: { ...state.byIds, [updatedEvent.id]: updatedEvent }
+        };
     default:
       return state;
   }
