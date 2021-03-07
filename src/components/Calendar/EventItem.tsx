@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, ChangeEvent } from 'react';
 import { useDispatch } from 'react-redux';
 import { deleteUserEvent, updateUserEvent, UserEvent } from '../../redux/user-events';
-import moment from "moment";
+import moment, { Moment } from "moment";
 
 interface Props{
   event: UserEvent
@@ -25,17 +25,20 @@ const EventItem: React.FC<Props> = ({event}) => {
         }
     }, [editable]);
 
-  const handleDeleteClick = () => {
-    dispatch(deleteUserEvent(event.id))
-  }
   const [title, setTitle] = useState(event.title)
   const handleTitleChange = (e:ChangeEvent<HTMLInputElement>) => {
     setTitle(e.target.value)
   }
  
+
+  const handleDeleteClick = () => {
+    dispatch(deleteUserEvent(event.id))
+  }
+
   const handleTitleClick = () => {
     setEditable(!editable); 
-}
+  }
+
   const handleTitleBlur = (e:React.FocusEvent<HTMLInputElement>) => {
     setEditable(false)
     if(title !== event.title)
@@ -45,12 +48,18 @@ const EventItem: React.FC<Props> = ({event}) => {
         }))
   }
 
+  const startTime: moment.Moment = moment.utc(event.startDate);
+  const endTime: moment.Moment = moment.utc(event.endDate);
+  console.log(moment.duration(endTime.diff(startTime)).asMinutes())
   return (
     <div key={event.id} className="calendar-event">
       <div className="calendar-event-info">
         <div className="calendar-event-time">
-          {moment.utc(event.startDate).format("HH:mm:ss")} -{" "}
-          {moment.utc(event.endDate).format("HH:mm:ss")}
+          {moment.utc(event.startDate).format("HH:mm")} -{" "}
+          {moment.utc(event.endDate).format("HH:mm")}
+        </div>
+        <div className="calendar-event-total-time">
+          {`${moment.duration(endTime.diff(startTime)).asMinutes().toString().substring(0,4)} minutes`}
         </div>
         <div className="calendar-event-title">
         {editable ? (<input type="text" 
