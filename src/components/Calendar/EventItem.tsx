@@ -28,6 +28,7 @@ const EventItem: React.FC<Props> = ({event}) => {
   const handleDeleteClick = () => {
     dispatch(deleteUserEvent(event.id))
   }
+
   const [title, setTitle] = useState(event.title)
   const handleTitleChange = (e:ChangeEvent<HTMLInputElement>) => {
     setTitle(e.target.value)
@@ -35,7 +36,8 @@ const EventItem: React.FC<Props> = ({event}) => {
  
   const handleTitleClick = () => {
     setEditable(!editable); 
-}
+  }
+  
   const handleTitleBlur = (e:React.FocusEvent<HTMLInputElement>) => {
     setEditable(false)
     if(title !== event.title)
@@ -45,12 +47,18 @@ const EventItem: React.FC<Props> = ({event}) => {
         }))
   }
 
+  const startTime: moment.Moment = moment.utc(event.startDate);
+  const endTime: moment.Moment = moment.utc(event.endDate);
+
   return (
     <div key={event.id} className="calendar-event">
       <div className="calendar-event-info">
         <div className="calendar-event-time">
-          {moment.utc(event.startDate).format("HH:mm:ss")} -{" "}
-          {moment.utc(event.endDate).format("HH:mm:ss")}
+          {startTime.format("HH:mm")} -{" "}
+          {startTime.format("HH:mm")}
+        </div>
+        <div className="calendar-event-total-time">
+          {`${moment.duration(endTime.diff(startTime)).asMinutes().toString().substring(0,4)} minutes`}
         </div>
         <div className="calendar-event-title">
         {editable ? (<input type="text" 
