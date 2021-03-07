@@ -44,7 +44,14 @@
 }
 
 .calendar-event-time {
-  font-size: 0.8em;
+  font-size: 16px;
+}
+
+.calendar-event-total-time{
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .calendar-event-delete-button {
@@ -54,7 +61,7 @@
   cursor: pointer;
   flex-shrink: 0;
   height: 23px;
-  font-size: 18px;
+  font-size: 20px;
   line-height: 20px;
   margin: 0 0 0 10px;
   padding: 0;
